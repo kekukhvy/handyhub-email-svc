@@ -11,11 +11,6 @@ storage:
     max-size: 10
     max-files: 5
 
-redis:
-  url: "localhost:6379"
-  password: ""
-  db: 3
-
 queue:
   rabbitmq:
     url: "amqp://guest:guest@localhost:5672/"
@@ -45,20 +40,11 @@ server:
 
 app:
   name: "handyhub-email-svc"
-  timeout: 30
 
 logs:
   level: "info"
   log-path: "logs/sys.log"
   #log-path: "../../../logs/sys.log"
-
-email:
-  smtp-host: "localhost"
-  smtp-port: 1025
-  smtp-user: ""
-  smtp-password: ""
-  from-email: "noreply@handyhub.com"
-  from-name: "HandyHub"
 
 smtp:
   provider: mailhog

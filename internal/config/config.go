@@ -2,7 +2,6 @@ package config
 
 import (
 	"os"
-	"strconv"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -14,11 +13,8 @@ type Configuration struct {
 	Server   ServerSettings `mapstructure:"server"`
 	App      Application    `mapstructure:"app"`
 	Logs     LogsSettings   `mapstructure:"logs"`
-	Security Security
-	Redis    Redis
-	Email    Email       `mapstructure:"email"`
-	Queue    QueueConfig `mapstructure:"queue"`
-	SMTP     SMTPConfig  `mapstructure:"smtp"`
+	Queue    QueueConfig    `mapstructure:"queue"`
+	SMTP     SMTPConfig     `mapstructure:"smtp"`
 }
 
 type Database struct {
@@ -37,33 +33,12 @@ type ServerSettings struct {
 }
 
 type Application struct {
-	Name    string `mapstructure:"name"`
-	Timeout int    `mapstructure:"timeout"`
+	Name string `mapstructure:"name"`
 }
 
 type LogsSettings struct {
 	Level string `mapstructure:"level"`
 	Path  string `mapstructure:"log-path"`
-}
-
-type Security struct {
-	JwtKey           string `mapstructure:"jwt-key"`
-	ExpirationPerion int    `mapstructure:"expiration_period"`
-}
-
-type Redis struct {
-	Url      string `mapstructure:"url"`
-	Password string `mapstructure:"password"`
-	Db       int    `mapstructure:"db"`
-}
-
-type Email struct {
-	SMTPHost     string `mapstructure:"smtp-host"`
-	SMTPPort     int    `mapstructure:"smtp-port"`
-	SMTPUser     string `mapstructure:"smtp-user"`
-	SMTPPassword string `mapstructure:"smtp-password"`
-	FromEmail    string `mapstructure:"from-email"`
-	FromName     string `mapstructure:"from-name"`
 }
 
 type StorageConfig struct {
@@ -140,21 +115,6 @@ func Load() *Configuration {
 	dbName := os.Getenv("DB_NAME")
 	if dbName != "" {
 		cfg.Database.DbName = dbName
-	}
-
-	redisHost := os.Getenv("REDIS_HOST")
-	if redisHost != "" {
-		cfg.Redis.Url = redisHost
-	}
-
-	redisDB := os.Getenv("REDIS_DB")
-	if redisDB != "" {
-		cfg.Redis.Db, _ = strconv.Atoi(redisDB)
-	}
-
-	jwtKey := os.Getenv("JWT_KEY")
-	if jwtKey != "" {
-		cfg.Security.JwtKey = jwtKey
 	}
 
 	return cfg
