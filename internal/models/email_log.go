@@ -16,3 +16,18 @@ type EmailLog struct {
 	SentAt   time.Time          `json:"sent_at" bson:"sent_at"`
 	ErrorMsg string             `json:"error_msg,omitempty" bson:"error_msg,omitempty"`
 }
+
+type EmailMessage struct {
+	To       []string `json:"to"`
+	Subject  string   `json:"subject"`
+	BodyHTML string   `json:"body_html"`
+	BodyText string   `json:"body_text"`
+	From     string   `json:"from"`
+}
+
+type QueueMessage struct {
+	Email     EmailMessage      `json:"email"`
+	Priority  string            `json:"priority"`
+	Metadata  map[string]string `json:"metadata,omitempty"`
+	Timestamp time.Time         `json:"timestamp" bson:"timestamp"`
+}

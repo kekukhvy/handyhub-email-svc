@@ -16,7 +16,9 @@ type Configuration struct {
 	Logs     LogsSettings   `mapstructure:"logs"`
 	Security Security
 	Redis    Redis
-	Email    Email `mapstructure:"email"`
+	Email    Email       `mapstructure:"email"`
+	Queue    QueueConfig `mapstructure:"queue"`
+	SMTP     SMTPConfig  `mapstructure:"smtp"`
 }
 
 type Database struct {
@@ -73,6 +75,56 @@ type FileStorageConfig struct {
 	Path      string `mapstructure:"path"`
 	MaxSizeMB int    `mapstructure:"max-size-mb"`
 	MaxFiles  int    `mapstructure:"max-files"`
+}
+
+type QueueConfig struct {
+	RabbitMQ RabbitMQConfig `mapstructure:"rabbitmq"`
+}
+
+type RabbitMQConfig struct {
+	Url            string `mapstructure:"url"`
+	Exchange       string `mapstructure:"exchange"`
+	ExchangeType   string `mapstructure:"exchange-type"`
+	EmailQueue     string `mapstructure:"email-queue"`
+	PrefetchCount  int    `mapstructure:"prefetch-count"`
+	ReconnectDelay int    `mapstructure:"reconnect-delay"`
+	Timeout        int    `mapstructure:"timeout"`
+	RoutingKey     string `mapstructure:"routing-key"`
+	PrefetchSize   int    `mapstructure:"prefetch-size"`
+	Global         bool   `mapstructure:"global"`
+	Durable        bool   `mapstructure:"durable"`
+	AutoDelete     bool   `mapstructure:"auto-delete"`
+	Internal       bool   `mapstructure:"internal"`
+	NoWait         bool   `mapstructure:"no-wait"`
+	Exclusive      bool   `mapstructure:"exclusive"`
+	AutoAck        bool   `mapstructure:"auto-ack"`
+	NoLocal        bool   `mapstructure:"no-local"`
+	Consumer       string `mapstructure:"consumer"`
+}
+
+type SMTPConfig struct {
+	Provider    string         `mapstructure:"provider"`
+	DefaultFrom string         `mapstructure:"default-from"`
+	Gmail       GmailConfig    `mapstructure:"gmail"`
+	SendGrid    SendGridConfig `mapstructure:"sendgrid"`
+	MailHog     MailHogConfig  `mapstructure:"mailhog"`
+}
+
+type GmailConfig struct {
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
+	Host     string `mapstructure:"host"`
+	Port     int    `mapstructure:"port"`
+}
+
+type SendGridConfig struct {
+	ApiKey string `mapstructure:"api-key"`
+	Url    string `mapstructure:"url"`
+}
+
+type MailHogConfig struct {
+	Host string `mapstructure:"host"`
+	Port int    `mapstructure:"port"`
 }
 
 func Load() *Configuration {

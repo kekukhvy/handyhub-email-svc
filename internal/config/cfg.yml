@@ -16,6 +16,27 @@ redis:
   password: ""
   db: 3
 
+queue:
+  rabbitmq:
+    url: "amqp://guest:guest@localhost:5672/"
+    exchange: "handyhub"
+    exchange-type: "topic"
+    email-queue: "email_queue"
+    prefetch-count: 1
+    prefetch-size: 0
+    global: false
+    reconnect-delay: 5
+    timeout: 10
+    routing-key: "email.send"
+    durable: true
+    auto-delete: false
+    internal: false
+    no-wait: false
+    exclusive: false
+    auto-ack: false
+    no-local: false
+    consumer: "email_consumer"
+
 server:
   port: ":8008"
   read-timeout: 30
@@ -38,3 +59,10 @@ email:
   smtp-password: ""
   from-email: "noreply@handyhub.com"
   from-name: "HandyHub"
+
+smtp:
+  provider: mailhog
+  default-from: "noreply@handyhub.com"
+  mailhog:
+    host: "localhost"
+    port: 1025
