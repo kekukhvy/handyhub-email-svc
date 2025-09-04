@@ -4,6 +4,7 @@ import (
 	"context"
 	"handyhub-email-svc/internal/config"
 	"handyhub-email-svc/internal/database"
+	"handyhub-email-svc/internal/storage"
 	"net/http"
 	"os"
 	"os/signal"
@@ -17,9 +18,10 @@ import (
 var log = logrus.StandardLogger()
 
 type Server struct {
-	httpServer *http.Server
-	config     *config.Configuration
-	mongodb    *database.MongoDB
+	httpServer   *http.Server
+	config       *config.Configuration
+	mongodb      *database.MongoDB
+	emailStorage storage.EmailStorage
 }
 
 func New(cfg *config.Configuration) *Server {
@@ -33,17 +35,29 @@ func (s *Server) Start() error {
 	var err error
 	var mongodb *database.MongoDB
 
-	mongodb, err = database.NewMongoDB(*s.config)
+	if s.config.Storage.Type == "database" {
+		mongodb, err = database.NewMongoDB(*s.config)
+		if err != nil {
+			log.WithError(err).Fatal("Failed to initialize MongoDB")
+			return err
+		}
+		s.mongodb = mongodb
+	} else {
+		log.Info("Skipping  MongoDB connection")
+	}
+
+	emailStorage, err := storage.NewEmailStorage(s.config, mongodb)
+
 	if err != nil {
-		log.WithError(err).Fatal("Failed to initialize MongoDB")
+		log.WithError(err).Fatal("Failed to initialize Email Storage")
 		return err
 	}
-	s.mongodb = mongodb
+	s.emailStorage = emailStorage
 
 	gin.SetMode(s.config.Server.Mode)
 	router := gin.Default()
 
-	SetupRoutes(router, s.config)
+	SetupRoutes(router, s.config, s.emailStorage)
 
 	s.httpServer = &http.Server{
 		Addr:         s.config.Server.Port,
@@ -80,6 +94,22 @@ func (s *Server) waitForShutdown() {
 func (s *Server) Shutdown() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
+	if s.emailStorage != nil {
+		if err := s.emailStorage.Close(); err != nil {
+			log.WithError(err).Error("Error closing email storage")
+		} else {
+			log.Info("Email storage closed")
+		}
+	}
+
+	if s.mongodb != nil {
+		if err := s.mongodb.Disconnect(ctx); err != nil {
+			log.WithError(err).Error("Error disconnecting MongoDB")
+		} else {
+			log.Info("MongoDB disconnected")
+		}
+	}
 
 	if err := s.httpServer.Shutdown(ctx); err != nil {
 		log.WithError(err).Fatal("Server forced to shutdown")

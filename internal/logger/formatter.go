@@ -35,7 +35,14 @@ func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 
 	// Format the log entry
 	timestamp := entry.Time.Format(time.RFC3339)
-	fmt.Fprintf(b, "\x1b[%dm[%s] [%s] %s\x1b[0m\n", levelColor, timestamp, entry.Level.String(), entry.Message)
+	fields := ""
+	for k, v := range entry.Data {
+		fields += fmt.Sprintf("%s=%v ", k, v)
+	}
+	if fields != "" {
+		fields = "{" + fields[:len(fields)-1] + "} "
+	}
+	fmt.Fprintf(b, "\x1b[%dm[%s] [%s] %s%s\x1b[0m\n", levelColor, timestamp, entry.Level.String(), fields, entry.Message)
 
 	return b.Bytes(), nil
 }

@@ -5,9 +5,9 @@ database:
   timeout: 10
 
 storage:
-  type: console
+  type: database
   file:
-    path: "emails"
+    path: "logs/emails"
     max-size: 10
     max-files: 5
 
