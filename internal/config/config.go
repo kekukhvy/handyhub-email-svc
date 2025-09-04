@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"strconv"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -115,6 +116,23 @@ func Load() *Configuration {
 	dbName := os.Getenv("DB_NAME")
 	if dbName != "" {
 		cfg.Database.DbName = dbName
+	}
+
+	rabbitmqUrl := os.Getenv("RABBITMQ_URL")
+	if rabbitmqUrl != "" {
+		cfg.Queue.RabbitMQ.Url = rabbitmqUrl
+	}
+
+	smtpHost := os.Getenv("SMTP_HOST")
+	if smtpHost != "" {
+		cfg.SMTP.MailHog.Host = smtpHost
+	}
+
+	smtpPort := os.Getenv("SMTP_PORT")
+	if smtpPort != "" {
+		if port, err := strconv.Atoi(smtpPort); err == nil {
+			cfg.SMTP.MailHog.Port = port
+		}
 	}
 
 	return cfg

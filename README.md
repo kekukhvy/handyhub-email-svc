@@ -323,15 +323,12 @@ db.emails.find().pretty()
 # 3. Payload:
 {
   "email": {
-    "to": ["test@example.com"],
-    "subject": "Integration Test",
-    "body": "This email tests the full RabbitMQ → Email Service → SMTP integration"
+    "to": ["test@example.com", "user@handyhub.com"],
+    "subject": "Test Email via MailHog",
+    "body_html": "<h1>Hello from MailHog!</h1><p>This email was sent via MailHog for testing.</p>",
+    "body_text": "Hello from MailHog! This email was sent via MailHog for testing."
   },
-  "priority": "high",
-  "metadata": {
-    "test_type": "integration"
-  },
-  "timestamp": "2025-09-04T10:30:00Z"
+  "timestamp": "2025-01-15T10:30:00Z"
 }
 ```
 
